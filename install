@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+set -e
+
+set -o allexport; source .env; set +o allexport
+
+SCRIPT_PATH="$PWD/${0:a:h}"
+skip_system_packages="${1}"
+os_type="$(uname -s)"
+IS_OSX="osx"
+IS_LINUX="linux"
+CONFIG_DIR=$HOME/.config
+ZSH_CONFIG_DIR=$CONFIG/zsh
+ZIM_HOME=$ZDOTDIR/zim
+ZIM_CONFIG_FILE=$ZDOTDIR/zimrc
+######################
+# Detect OS
+######################
+function no_system_packages() {
+cat << EOF
+System package installation isn't supported with your OS / distro.
+  
+Please install any dependent packages on your own.
+EOF
+  
+exit 1
+}
+case "${os_type}" in
+  Linux*)
+    os_type=$IS_LINUX
+    
+    if [ ! -f "/etc/debian_version"]; then
+      [ -z "${skip_system_packages}" ] && no_system_packages
+    fi
+    
+    ;;
+    Darwin*) os_type=$IS_OSX ;;
+    *)
+      os_type="Other"
+      
+      [ -z "${skip_system_packages}" ] && no_system_packages
+      
+      ;;
+      
+esac
+
+echo "Operating system ${os_type}"
+
+###############################################################################
+# Create initial directories
+###############################################################################
+
+mkdir -p "${CONFIG_DIR}/zsh" "${HOME}/.cache/zsh" \
+    "${HOME}/.local/bin" "${HOME}/.local/share" \
+    "${HOME}/.local/state" "${HOME}/.vim/spell" \
+    "${HOME}/.config/git" "${CONFIG_DIR}/nvm"
+    
+if [ ! -f $HOME/.zshenv ]; then
+ln -s ${SCRIPT_PATH}shell/zsh/zshenv $HOME/.zshenv
+fi
+if command -v brew > /dev/null 2>&1; then
+  echo "[BREEEWWW] installed!"
+else
+  echo "Installing [BREEEWWW]"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+echo "Configuring git"
+rm -f $CONFIG_DIR/git/{attributes,ignore,config} $HOME/.gitconfig
+ln -s ${SCRIPT_PATH}git/attributes $CONFIG_DIR/git/attributes
+ln -s ${SCRIPT_PATH}git/ignore $CONFIG_DIR/git/ignore
+ln -s ${SCRIPT_PATH}git/config $CONFIG_DIR/git/config
+
+# Copy config.local if exists (private config, not in repo)
+if [ -f ${SCRIPT_PATH}git/config.local ]; then
+  cp ${SCRIPT_PATH}git/config.local $CONFIG_DIR/git/config.local
+  echo "  ✓ Copied git/config.local (private configuration)"
+else
+  echo "  ⚠ Warning: git/config.local not found. You'll need to create it manually at $CONFIG_DIR/git/config.local"
+fi
+
+ln -s $CONFIG_DIR/git/config $HOME/.gitconfig  
+
+if [ ! -d $ZIM_HOME ]; then
+  echo "Installing ZIM Framework"
+  curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
+fi
+rm -f $ZDOTDIR/.zimrc
+ln -s ${SCRIPT_PATH}shell/zsh/.zimrc $ZDOTDIR/.zimrc

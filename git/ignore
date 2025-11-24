@@ -1,0 +1,3 @@
+*.zsh.zwc
+.idea
+.DS_Store

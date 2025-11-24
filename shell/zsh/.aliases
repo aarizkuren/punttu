@@ -1,0 +1,41 @@
+if command -v brew > /dev/null 2>&1; then
+  alias ls="ls -G"
+  alias grep="grep -G"
+  alias fgrep="fgrep -G"
+  alias egrep="egrep -G"
+else
+  alias ls="ls --color=auto"
+  alias grep="grep --color=auto"
+  alias fgrep="fgrep --color=auto"
+  alias egrep="egrep --color=auto"
+fi
+
+alias ll="ls -alF"
+alias la="ls -A"
+alias l="ls -CF"
+
+alias cfa='${EDITOR} ${ZDOTDIR}/.aliases'
+alias cfp='${EDITOR} ${ZDOTDIR}/.zprofile'
+alias cfr='${EDITOR} ${ZDOTDIR}/.zshrc'
+alias sfr='. ${ZDOTDIR}/.zshrc'
+alias cfv='${EDITOR} ${HOME}/.vimrc'
+alias cft='${EDITOR} ${HOME}/.tmux.conf'
+alias dt='cd ${HOME}/src/github/dotfiles'
+
+alias drun='docker run --rm -it -v "${PWD}":/app -w /app'
+
+alias diff="diff --color -u"
+
+alias 755d="find . -type d -exec chmod 755 {} \;"
+
+alias 644f="find . -type f -exec chmod 644 {} \;"
+
+alias vss='sort -u ${HOME}/.vim/spell/en.utf-8.add -o ${HOME}/.vim/spell/en.utf-8.add'
+
+alias gi="git init && git symbolic-ref HEAD refs/heads/main"
+
+alias pf="fzf ${FZF_CTRL_T_OPTS}"
+
+alias gcl="git diff --name-only --diff-filter=U"
+
+alias cursor="open -a Cursor"

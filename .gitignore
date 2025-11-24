@@ -1,0 +1,7 @@
+.env
+.DS_Store
+.aliases.sh
+
+# Git config local (información privada)
+git/config.local
+git/*.local
